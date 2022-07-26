@@ -51,6 +51,7 @@ form {
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
+  white-space: nowrap;
 }
 
 #download-images:hover {
