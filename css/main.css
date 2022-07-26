@@ -11,11 +11,13 @@ body {
 form {
   display: flex;
   justify-content: center;
+  align-content: center;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 #url-input {
-  width: calc(80vw - 16em);
+  width: 80%;
   height: 1.5em;
   outline: none;
   border: 1px solid #c6c9d5;
