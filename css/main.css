@@ -72,7 +72,6 @@ form {
 }
 
 .gallery figure:hover {
-  translate: 0 10px;
   transform: translate(0, 10px);
 }
 
