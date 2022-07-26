@@ -59,30 +59,30 @@ form {
 .gallery {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  margin: 1.5rem;
-  padding-bottom: 5em;
+  gap: 1.5em;
+  margin: 1.5em;
+  padding-bottom: 10vh;
 }
 
 .gallery figure {
   display: flex;
   flex-flow: column;
   margin: auto;
-  transition: all 0.1s linear;
+  transition: all 0.1s ease-in-out;
 }
 
 .gallery figure:hover {
-  transform: translate(0, 10px);
+  transform: scale(1.025);
 }
 
 .gallery img {
   width: 100%;
   cursor: pointer;
-  border: 2px solid black;
+  border: 1px solid black;
 }
 
 .gallery figcaption {
-  padding: 0.5rem;
+  padding: 0.25ex;
   text-align: center;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   font-size: 1.25em;
