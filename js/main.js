@@ -58,19 +58,18 @@ document.querySelector("form").addEventListener("submit", async (event) => {
     (
       await Promise.all(
         urls.map(async (url) => {
-          const response = await fetch(url);
+          const response = await fetch(
+            `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
+          );
 
           if (!response.ok) {
-            if (response.status !== 404) {
-              console.error(
-                `Failed to fetch ${url} : ${response.status} (${response.statusText})`
-              );
-            }
-
+            console.error(
+              `Failed to fetch ${url} : ${response.status} (${response.statusText})`
+            );
             return [];
           }
 
-          const page = await response.text();
+          const { contents: page } = await response.json();
           const imageUrls = [];
 
           const [, colorImagesStr] = page.match(/'colorImages': (.+)/) ?? [];
