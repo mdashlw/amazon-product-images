@@ -46,6 +46,8 @@ form {
   color: white;
   text-transform: uppercase;
   padding: 0.25em 0.5em;
+  -webkit-user-select: none;
+  -moz-user-select: none;
   user-select: none;
 }
 
