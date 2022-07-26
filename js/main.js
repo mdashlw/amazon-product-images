@@ -25,12 +25,6 @@ document.querySelector("form").addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const inputUrl = document.querySelector("#url-input").value;
-
-  if (!inputUrl.includes("amazon.")) {
-    alert("Invalid URL.");
-    return;
-  }
-
   let urlObject;
 
   try {
