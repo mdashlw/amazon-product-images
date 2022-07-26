@@ -40,7 +40,10 @@ document.querySelector("form").addEventListener("submit", async (event) => {
     return;
   }
 
-  if (!urlObject.hostname.startsWith("amazon.")) {
+  if (
+    !urlObject.hostname.startsWith("amazon.") &&
+    !urlObject.hostname.startsWith("www.amazon.")
+  ) {
     alert("Invalid URL.");
     return;
   }
