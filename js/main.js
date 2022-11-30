@@ -21,6 +21,34 @@ const domains = [
   "co.uk",
 ];
 
+function getAllImageUrls(url) {
+  url = new URL(url);
+  const pathnameParts = url.pathname.split("/");
+  const lastPathnamePart = pathnameParts.pop();
+  const basePathname = pathnameParts.join("/");
+
+  return lastPathnamePart
+    .split("%7C")
+    .filter((fragment) => fragment.includes("."))
+    .map((fragment, _, fragments) => {
+      if (fragment.includes("%2C")) {
+        return;
+      }
+
+      return fragment
+        .replace("._CLa", () => {
+          const lastFragment = fragments.at(-1);
+
+          return lastFragment.substring(lastFragment.lastIndexOf("."));
+        })
+        .split(".")
+        .filter((part) => !part.startsWith("_"))
+        .join(".");
+    })
+    .filter(Boolean)
+    .map((fragment) => new URL(`${basePathname}/${fragment}`, url).toString());
+}
+
 document.querySelector("form").addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -42,9 +70,11 @@ document.querySelector("form").addEventListener("submit", async (event) => {
     return;
   }
 
+  urlObject.search = "";
+
   const usUrl = domains.reduce(
     (url, domain) => url.replace(`amazon.${domain}`, "amazon.com"),
-    inputUrl.replace("http:", "https:")
+    urlObject.toString().replace("http:", "https:")
   );
   const urls = [
     usUrl,
@@ -56,7 +86,7 @@ document.querySelector("form").addEventListener("submit", async (event) => {
       await Promise.all(
         urls.map(async (url) => {
           const response = await fetch(
-            `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
+            `https://corsproxy.io/?${encodeURIComponent(url)}`
           );
 
           if (!response.ok) {
@@ -66,32 +96,26 @@ document.querySelector("form").addEventListener("submit", async (event) => {
             return [];
           }
 
-          const { contents: page } = await response.json();
+          const page = await response.text();
           const imageUrls = [];
 
-          const [, colorImagesStr] = page.match(/'colorImages': (.+)/) ?? [];
+          let [, colorImages] = page.match(/'colorImages': (.+),/) ?? [];
 
-          if (colorImagesStr) {
-            let colorImages;
-            eval(`colorImages = ${colorImagesStr.slice(0, -1)}`);
+          if (colorImages) {
+            colorImages = eval(`(${colorImages})`);
 
             for (const { hiRes, large } of colorImages.initial) {
-              let imageUrl = hiRes ?? large;
-              const extension = imageUrl.substring(imageUrl.lastIndexOf("."));
-              imageUrl = imageUrl.substring(0, imageUrl.lastIndexOf("."));
-              imageUrl = imageUrl.substring(0, imageUrl.lastIndexOf("."));
-              imageUrl = `${imageUrl}${extension}`;
+              const imageUrl = hiRes ?? large;
 
-              imageUrls.push(imageUrl);
+              imageUrls.push(...getAllImageUrls(imageUrl));
             }
           }
 
-          const [, imageGalleryDataStr] =
-            page.match(/'imageGalleryData' : (.+)/) ?? [];
+          let [, imageGalleryData] =
+            page.match(/'imageGalleryData' : (.+),/) ?? [];
 
-          if (imageGalleryDataStr) {
-            let imageGalleryData;
-            eval(`imageGalleryData = ${imageGalleryDataStr.slice(0, -1)}`);
+          if (imageGalleryData) {
+            imageGalleryData = eval(`(${imageGalleryData})`);
 
             for (const { mainUrl } of imageGalleryData) {
               imageUrls.push(mainUrl);
