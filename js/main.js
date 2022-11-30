@@ -1,24 +1,25 @@
 const domains = [
-  "com.au",
-  "com.br",
-  "ca",
-  "cn",
-  "eg",
-  "fr",
-  "de",
-  "in",
-  "it",
-  "co.jp",
-  "com.mx",
-  "nl",
-  "pl",
-  "sa",
-  "sg",
-  "es",
-  "se",
-  "com.tr",
-  "ae",
-  "co.uk",
+  "com.au", // Australia
+  "com.be", // Belgium
+  "com.br", // Brazil
+  "ca", // Canada
+  "cn", // China
+  "eg", // Egypt
+  "fr", // France
+  "de", // Germany
+  "in", // India
+  "it", // Italy
+  "co.jp", // Japan
+  "com.mx", // Mexico
+  "nl", // Netherlands
+  "pl", // Poland
+  "sa", // Saudi Arabia
+  "sg", // Singapore
+  "es", // Spain
+  "se", // Sweden
+  "com.tr", // Turkey
+  "ae", // United Arab Emirates
+  "co.uk", // United Kingdom
 ];
 
 function getAllImageUrls(url) {
