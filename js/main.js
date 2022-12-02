@@ -82,52 +82,60 @@ document.querySelector("form").addEventListener("submit", async (event) => {
     ...domains.map((domain) => usUrl.replace("amazon.com", `amazon.${domain}`)),
   ];
 
-  const imageUrls = new Set(
-    (
-      await Promise.all(
-        urls.map(async (url) => {
-          const response = await fetch(
-            `https://corsproxy.io/?${encodeURIComponent(url)}`
+  const visitedImageUrlPathnames = new Set();
+  const imageUrls = (
+    await Promise.all(
+      urls.map(async (url) => {
+        const response = await fetch(
+          `https://corsproxy.io/?${encodeURIComponent(url)}`
+        );
+
+        if (!response.ok) {
+          console.error(
+            `Failed to fetch ${url} : ${response.status} (${response.statusText})`
           );
+          return [];
+        }
 
-          if (!response.ok) {
-            console.error(
-              `Failed to fetch ${url} : ${response.status} (${response.statusText})`
-            );
-            return [];
+        const page = await response.text();
+        const imageUrls = [];
+
+        let [, colorImages] = page.match(/'colorImages': (.+),/) ?? [];
+
+        if (colorImages) {
+          colorImages = eval(`(${colorImages})`);
+
+          for (const { hiRes, large } of colorImages.initial) {
+            const imageUrl = hiRes ?? large;
+
+            imageUrls.push(...getAllImageUrls(imageUrl));
           }
+        }
 
-          const page = await response.text();
-          const imageUrls = [];
+        let [, imageGalleryData] =
+          page.match(/'imageGalleryData' : (.+),/) ?? [];
 
-          let [, colorImages] = page.match(/'colorImages': (.+),/) ?? [];
+        if (imageGalleryData) {
+          imageGalleryData = eval(`(${imageGalleryData})`);
 
-          if (colorImages) {
-            colorImages = eval(`(${colorImages})`);
-
-            for (const { hiRes, large } of colorImages.initial) {
-              const imageUrl = hiRes ?? large;
-
-              imageUrls.push(...getAllImageUrls(imageUrl));
-            }
+          for (const { mainUrl } of imageGalleryData) {
+            imageUrls.push(mainUrl);
           }
+        }
 
-          let [, imageGalleryData] =
-            page.match(/'imageGalleryData' : (.+),/) ?? [];
+        return imageUrls;
+      })
+    )
+  )
+    .flat()
+    .filter((url) => {
+      const pathname = new URL(url).pathname;
 
-          if (imageGalleryData) {
-            imageGalleryData = eval(`(${imageGalleryData})`);
-
-            for (const { mainUrl } of imageGalleryData) {
-              imageUrls.push(mainUrl);
-            }
-          }
-
-          return imageUrls;
-        })
-      )
-    ).flat()
-  );
+      return (
+        !visitedImageUrlPathnames.has(pathname) &&
+        visitedImageUrlPathnames.add(pathname)
+      );
+    });
 
   const gallery = document.querySelector(".gallery");
 
